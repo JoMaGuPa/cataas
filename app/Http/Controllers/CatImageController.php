@@ -11,7 +11,29 @@ class CatImageController extends Controller
      */
     public function index()
     {
-        $cats = CatImage::paginate(6); // Paginació de 6 imatges per pàgina
+        $cats = CatImage::paginate(6);
         return view('cats.index', compact('cats'));
+    }
+
+    public function filterByTag($tag)
+    {
+        $cats = CatImage::all();
+
+        $filteredCats = $cats->filter(function ($cat) use ($tag) {
+            $tags = json_decode($cat->tags);
+            return in_array($tag, $tags);
+        });
+
+        $perPage = 6;
+        $catsPaginated = new \Illuminate\Pagination\LengthAwarePaginator(
+            $filteredCats->forPage(request()->get('page', 1), $perPage),
+            $filteredCats->count(),
+            $perPage,
+            request()->get('page', 1)
+        );
+
+        $catsPaginated->withPath(route('cats.filter', $tag));
+
+        return view('cats.index', ['cats' => $catsPaginated]);
     }
 }

@@ -9,3 +9,4 @@ Route::get('/', function () {
 });
 
 Route::get('/cats', [CatImageController::class, 'index'])->name('cats.index'); 
+Route::get('/cats/tag/{tag}', [CatImageController::class, 'filterByTag'])->name('cats.filter');
